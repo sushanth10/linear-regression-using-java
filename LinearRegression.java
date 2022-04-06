@@ -8,24 +8,34 @@ public class LinearRegression{
     double sd_x=0, sd_y=0; // variables to store the standard deviations 
     static long n = 0; // variable to store the number of coordinates
     static double sum_x=0, sum_y=0, sum_XY=0; // store the sums of numbers
+    static double sum_X_sq=0, sum_Y_sq=0;
     double coef_ = 0, slope_ =0; // store the calculated slope and coefficient of correlation
     double intercept_ = 0; // stores the intercept value for the equation
     double mean_squared_error_ = 0; // stores the mean squared error value
     double r_square_score = 0; //stores the r-square score
-    double sum_squared_resid = 0;
+    double sum_squared_resid = 0; // stores squared sum of residuals    
 
 
     void addCoordinate(double[] coord){
+        // adds each coordinate to the arraylist as and when input received
         this.al.add(coord);
-        n++;
+        n++; //increments the number of datapoints
+
+        // calculates the sum value for the variables 
         sum_x+= coord[0];
         sum_y+=coord[1];
+
+        // updates average values there itself  
         avg_x = avg_x + (coord[0]-avg_x)/n;
         avg_y = avg_y + (coord[1]-avg_y)/n;
     }
 
     void calcStandardDeviation(){
-        double sum_X_sq=0, sum_Y_sq=0;
+        if(al.size()==0){ 
+            System.out.println("No datapoints to calculate regression");
+            System.exit(0);
+        }
+
         for(double[] coord : al){
             sum_X_sq += (coord[0]-avg_x)*(coord[0]-avg_x);
             sum_Y_sq += (coord[1]-avg_y)*(coord[1]-avg_y);
@@ -60,12 +70,20 @@ public class LinearRegression{
         System.out.println("Coefficient of correlation : "+this.coef_);
         System.out.println("Linear Model created with equation : y="+this.slope_+"x+"+this.intercept_);
         System.out.println("MSE score for the model : "+this.mean_squared_error_);
+
+        if(this.r_square_score>0.5){
+            System.out.println("Very good R^2 score.");
+        }else{
+            System.out.println("R^2 score not very good for model creation");
+        }
+        System.out.println("R Square Score for the model : "+this.r_square_score);
     }
 
     void fit(){
         this.calcStandardDeviation();
         this.calcCorrelation();
         this.calcMeanSquaredError();
+        this.calcRSquareScore();
         this.displayResults();
     }
 
@@ -83,7 +101,7 @@ public class LinearRegression{
     }
 
     void calcRSquareScore(){
-
+        this.r_square_score = 1-(this.sum_squared_resid)/(sum_Y_sq);
     }
 
     public static void main(String args[]){
@@ -106,21 +124,28 @@ public class LinearRegression{
                     double[] coord = {a,b};
                     lm.addCoordinate(coord);
                 }else{
-                    break;
+                    if(ch=='n'){
+                        break;
+                    }else{
+                        throw new Exception("Not a valid input");
+                    }
                 }
             }
+
+
+            lm.fit();
+
+            System.out.print("\nEnter value of X for prediction : ");
+            double X = sc.nextDouble();
+            double Y = lm.predict(X);
+            System.out.println("Predicted Y value : "+Y);
+
         }catch(Exception e){
             System.out.println("Invalid input.");
         }
 
-
-        lm.fit();
-
-        System.out.print("\nEnter value of X for prediction : ");
-        double X = sc.nextDouble();
-        double Y = lm.predict(X);
-        System.out.println("Predicted Y value : "+Y);
-        
         sc.close();
+
+        System.out.println("-----END OF PROGRAM-----");
     }
 }
