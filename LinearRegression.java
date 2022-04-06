@@ -1,13 +1,19 @@
 import java.util.*;
 
 public class LinearRegression{
+
+    // arraylist to store the coordinates 
     ArrayList<double[]> al = new ArrayList<double[]>();
-    static double avg_x=0, avg_y=0;
-    double sd_x=0, sd_y=0;
-    static long n = 0;
-    static double sum_x=0, sum_y=0, sum_XY=0;
-    double coef_ = 0, slope_ =0;
-    double intercept_ = 0;
+    static double avg_x=0, avg_y=0; // variables to store the means 
+    double sd_x=0, sd_y=0; // variables to store the standard deviations 
+    static long n = 0; // variable to store the number of coordinates
+    static double sum_x=0, sum_y=0, sum_XY=0; // store the sums of numbers
+    double coef_ = 0, slope_ =0; // store the calculated slope and coefficient of correlation
+    double intercept_ = 0; // stores the intercept value for the equation
+    double mean_squared_error_ = 0; // stores the mean squared error value
+    double r_square_score = 0; //stores the r-square score
+    double sum_squared_resid = 0;
+
 
     void addCoordinate(double[] coord){
         this.al.add(coord);
@@ -28,7 +34,7 @@ public class LinearRegression{
         this.sd_x = Math.pow(sum_X_sq/n, 0.5);
         this.sd_y = Math.pow(sum_Y_sq/n, 0.5);
 
-        System.out.println("Sum squares : "+sum_X_sq+" "+sum_Y_sq);
+        // System.out.println("Sum squares : "+sum_X_sq+" "+sum_Y_sq);
 
     }
 
@@ -53,11 +59,13 @@ public class LinearRegression{
         }
         System.out.println("Coefficient of correlation : "+this.coef_);
         System.out.println("Linear Model created with equation : y="+this.slope_+"x+"+this.intercept_);
+        System.out.println("MSE score for the model : "+this.mean_squared_error_);
     }
 
     void fit(){
         this.calcStandardDeviation();
         this.calcCorrelation();
+        this.calcMeanSquaredError();
         this.displayResults();
     }
 
@@ -66,23 +74,49 @@ public class LinearRegression{
         return Y;
     }
 
+    void calcMeanSquaredError(){
+        this.sum_squared_resid = 0;
+        for(double[] coord : al){
+            this.sum_squared_resid += Math.pow(coord[1]-(this.slope_*coord[0]+this.intercept_),2);
+        }
+        this.mean_squared_error_ = sum_squared_resid/n;
+    }
+
+    void calcRSquareScore(){
+
+    }
+
     public static void main(String args[]){
         System.out.println("-----PROGRAM STARTED------\n");
         Scanner sc = new Scanner(System.in);
-        System.out.print("Enter number of coordinates : ");
-        long N = sc.nextLong();
-        LinearRegression lm = new LinearRegression();
 
-        for(long i=0; i<N; i++){
-            System.out.print("Enter coordinate : ");
-            double a = sc.nextDouble();
-            double b = sc.nextDouble();
-            double[] coord = {a,b};
-            lm.addCoordinate(coord);
+        // USE THE FOLLOWING LINES IF THERE ARE FIXED NUMBER OF POINTS
+        // System.out.print("Enter number of coordinates : ");
+        // long N = sc.nextLong();
+
+        LinearRegression lm = new LinearRegression();
+        try{
+            while(true){
+                System.out.print("Would you like to put one more data point? y/n : ");
+                char ch = sc.next().charAt(0);
+                if(ch=='y'){
+                    System.out.print("Enter coordinate : ");
+                    double a = sc.nextDouble();
+                    double b = sc.nextDouble();
+                    double[] coord = {a,b};
+                    lm.addCoordinate(coord);
+                }else{
+                    break;
+                }
+            }
+        }catch(Exception e){
+            System.out.println("Invalid input.");
         }
+
+
         lm.fit();
 
-        System.out.print("Enter value of X for prediction : ");
+        System.out.print("\nEnter value of X for prediction : ");
         double X = sc.nextDouble();
         double Y = lm.predict(X);
         System.out.println("Predicted Y value : "+Y);
