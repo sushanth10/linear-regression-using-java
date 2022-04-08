@@ -25,22 +25,25 @@ public class LinearRegression{
         sum_x+= coord[0];
         sum_y+=coord[1];
 
-        // updates average values there itself  
+        // updates mean x and y values there itself  
         avg_x = avg_x + (coord[0]-avg_x)/n;
         avg_y = avg_y + (coord[1]-avg_y)/n;
     }
 
     void calcStandardDeviation(){
+        // nothing to calculate if there are no datapoints and end the program
         if(al.size()==0){ 
             System.out.println("No datapoints to calculate regression");
             System.exit(0);
         }
 
+        // iterate through the list of datapoints to calculate sum squares of
         for(double[] coord : al){
             sum_X_sq += (coord[0]-avg_x)*(coord[0]-avg_x);
             sum_Y_sq += (coord[1]-avg_y)*(coord[1]-avg_y);
             sum_XY += (coord[0]-avg_x)*(coord[1]-avg_y);
         }
+
         this.sd_x = Math.pow(sum_X_sq/n, 0.5);
         this.sd_y = Math.pow(sum_Y_sq/n, 0.5);
 
@@ -49,7 +52,10 @@ public class LinearRegression{
     }
 
     void calcCorrelation(){
+        // calculates coefficient of correlation 
         this.coef_ = sum_XY/(n*sd_x*sd_y);
+
+        // calculates m and c values for the equation y=mx+c    
         this.slope_ = coef_*sd_y/sd_x;
         this.intercept_ = avg_y - (this.slope_*avg_x);
     }
@@ -67,6 +73,7 @@ public class LinearRegression{
         }else{
             System.out.println("Not very co-related data.");
         }
+
         System.out.println("Coefficient of correlation : "+this.coef_);
         System.out.println("Linear Model created with equation : y="+this.slope_+"x+"+this.intercept_);
         System.out.println("MSE score for the model : "+this.mean_squared_error_);
@@ -80,6 +87,7 @@ public class LinearRegression{
     }
 
     void fit(){
+        // calculates all the required values for the model
         this.calcStandardDeviation();
         this.calcCorrelation();
         this.calcMeanSquaredError();
@@ -88,21 +96,27 @@ public class LinearRegression{
     }
 
     double predict(double X){
+        // predicts the value of dependent variable on the basis of the X value 
         double Y = this.slope_*X+this.intercept_;
         return Y;
     }
 
     void calcMeanSquaredError(){
+        // finds sum of squares of errors
         this.sum_squared_resid = 0;
         for(double[] coord : al){
             this.sum_squared_resid += Math.pow(coord[1]-(this.slope_*coord[0]+this.intercept_),2);
         }
+        // finds mean of squared errors 
         this.mean_squared_error_ = sum_squared_resid/n;
     }
 
     void calcRSquareScore(){
+        // finds R^2 score 
         this.r_square_score = 1-(this.sum_squared_resid)/(sum_Y_sq);
     }
+
+
 
     public static void main(String args[]){
         System.out.println("-----PROGRAM STARTED------\n");
@@ -115,6 +129,8 @@ public class LinearRegression{
         LinearRegression lm = new LinearRegression();
         try{
             while(true){
+                // takes all the datapoints as input one by one from the user 
+                // throws exception when the required input is not received
                 System.out.print("Would you like to put one more data point? y/n : ");
                 char ch = sc.next().charAt(0);
                 if(ch=='y'){
@@ -132,9 +148,10 @@ public class LinearRegression{
                 }
             }
 
-
+            // finds all the required metrics 
             lm.fit();
 
+            // PREDICTION PART
             System.out.print("\nEnter value of X for prediction : ");
             double X = sc.nextDouble();
             double Y = lm.predict(X);
