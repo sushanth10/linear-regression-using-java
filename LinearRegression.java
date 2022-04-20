@@ -4,9 +4,10 @@ public class LinearRegression{
 
     // arraylist to store the coordinates 
     ArrayList<double[]> al = new ArrayList<double[]>();
+    ArrayList<double[]> train_points = new ArrayList<double[]>();
+    ArrayList<double[]> test_points = new ArrayList<double[]>();
     static double avg_x=0, avg_y=0; // variables to store the means 
-    double sd_x=0, sd_y=0; // variables to store the standard deviations 
-    static long n = 0; // variable to store the number of coordinates
+    double sd_x=0, sd_y=0; // variables to store the standard deviations
     static double sum_x=0, sum_y=0, sum_XY=0; // store the sums of numbers
     static double sum_X_sq=0, sum_Y_sq=0;
     double coef_ = 0, slope_ =0; // store the calculated slope and coefficient of correlation
@@ -19,15 +20,18 @@ public class LinearRegression{
     void addCoordinate(double[] coord){
         // adds each coordinate to the arraylist as and when input received
         this.al.add(coord);
-        n++; //increments the number of datapoints
+    }
 
-        // calculates the sum value for the variables 
-        sum_x+= coord[0];
-        sum_y+=coord[1];
+    void calcMeans(){
+        
+        for(double[] coord: this.train_points){
+            // calculates the sum value for the variables 
+            sum_x+= coord[0];
+            sum_y+=coord[1];
+        }
 
-        // updates mean x and y values there itself  
-        avg_x = avg_x + (coord[0]-avg_x)/n;
-        avg_y = avg_y + (coord[1]-avg_y)/n;
+        avg_x = sum_x/train_points.size();
+        avg_y = sum_y/train_points.size();
     }
 
     void calcStandardDeviation(){
@@ -38,14 +42,14 @@ public class LinearRegression{
         }
 
         // iterate through the list of datapoints to calculate sum squares of
-        for(double[] coord : al){
+        for(double[] coord : this.train_points){
             sum_X_sq += (coord[0]-avg_x)*(coord[0]-avg_x);
             sum_Y_sq += (coord[1]-avg_y)*(coord[1]-avg_y);
             sum_XY += (coord[0]-avg_x)*(coord[1]-avg_y);
         }
 
-        this.sd_x = Math.pow(sum_X_sq/n, 0.5);
-        this.sd_y = Math.pow(sum_Y_sq/n, 0.5);
+        this.sd_x = Math.pow(sum_X_sq/train_points.size(), 0.5);
+        this.sd_y = Math.pow(sum_Y_sq/train_points.size(), 0.5);
 
         // System.out.println("Sum squares : "+sum_X_sq+" "+sum_Y_sq);
 
@@ -53,7 +57,7 @@ public class LinearRegression{
 
     void calcCorrelation(){
         // calculates coefficient of correlation 
-        this.coef_ = sum_XY/(n*sd_x*sd_y);
+        this.coef_ = sum_XY/(this.train_points.size()*sd_x*sd_y);
 
         // calculates m and c values for the equation y=mx+c    
         this.slope_ = coef_*sd_y/sd_x;
@@ -88,11 +92,23 @@ public class LinearRegression{
 
     void fit(){
         // calculates all the required values for the model
+        this.train_test_split();
+        this.calcMeans();
         this.calcStandardDeviation();
         this.calcCorrelation();
         this.calcMeanSquaredError();
         this.calcRSquareScore();
         this.displayResults();
+    }
+
+    void train_test_split(){
+        int num_train_points = (int)Math.floor(0.7*al.size());
+        this.test_points = new ArrayList<>(this.al);
+        for(int i=0; i<num_train_points; i++){
+            double[] pt = al.get((int)Math.floor(Math.random()*num_train_points));
+            this.train_points.add(pt);
+            this.test_points.remove(pt);
+        }
     }
 
     double predict(double X){
@@ -104,11 +120,11 @@ public class LinearRegression{
     void calcMeanSquaredError(){
         // finds sum of squares of errors
         this.sum_squared_resid = 0;
-        for(double[] coord : al){
+        for(double[] coord : this.test_points){
             this.sum_squared_resid += Math.pow(coord[1]-(this.slope_*coord[0]+this.intercept_),2);
         }
         // finds mean of squared errors 
-        this.mean_squared_error_ = sum_squared_resid/n;
+        this.mean_squared_error_ = sum_squared_resid/this.test_points.size();
     }
 
     void calcRSquareScore(){
@@ -127,6 +143,7 @@ public class LinearRegression{
         // long N = sc.nextLong();
 
         LinearRegression lm = new LinearRegression();
+
         try{
             while(true){
                 // takes all the datapoints as input one by one from the user 
@@ -148,6 +165,9 @@ public class LinearRegression{
                 }
             }
 
+            if(lm.al.size()<4){
+                throw new Exception("Not enough datapoints to split the dataset");
+            }
             // finds all the required metrics 
             lm.fit();
 
