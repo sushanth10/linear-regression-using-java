@@ -6,8 +6,8 @@ public class LinearRegression{
 
     // arraylist to store the coordinates 
     ArrayList<double[]> al = new ArrayList<double[]>();
-    ArrayList<double[]> train_points = new ArrayList<double[]>();
-    ArrayList<double[]> test_points = new ArrayList<double[]>();
+    ArrayList<double[]> train_points = new ArrayList<double[]>(); // to store training data points
+    ArrayList<double[]> test_points = new ArrayList<double[]>(); // to store testing data points
     static double avg_x=0, avg_y=0; // variables to store the means 
     double sd_x=0, sd_y=0; // variables to store the standard deviations
     static double sum_x=0, sum_y=0, sum_XY=0; // store the sums of numbers
@@ -25,13 +25,11 @@ public class LinearRegression{
     }
 
     void calcMeans(){
-        
         for(double[] coord: this.train_points){
             // calculates the sum value for the variables 
             sum_x+= coord[0];
             sum_y+=coord[1];
         }
-
         avg_x = sum_x/train_points.size();
         avg_y = sum_y/train_points.size();
     }
@@ -135,7 +133,6 @@ public class LinearRegression{
     }
 
 
-
     public static void main(String args[]) throws Exception{
         System.out.println("-----PROGRAM STARTED------\n");
         Scanner sc = new Scanner(System.in);
@@ -180,7 +177,6 @@ public class LinearRegression{
                 lm.addCoordinate(coord);
             }
 
-
             if(lm.al.size()<4){
                 throw new Exception("Not enough datapoints to split the dataset");
             }
@@ -197,12 +193,8 @@ public class LinearRegression{
             System.out.println("Invalid input.");
         }
         
-        
         sc.close();
 
-        System.out.println("\n-----END OF PROGRAM-----");
-
-
-        
+        System.out.println("\n-----END OF PROGRAM-----");  
     }
 }
