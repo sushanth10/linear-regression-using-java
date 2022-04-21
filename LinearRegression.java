@@ -1,4 +1,6 @@
+// import java.io.File;
 import java.util.*;
+import java.io.*;
 
 public class LinearRegression{
 
@@ -78,9 +80,9 @@ public class LinearRegression{
             System.out.println("Not very co-related data.");
         }
 
-        System.out.println("Coefficient of correlation : "+this.coef_);
-        System.out.println("Linear Model created with equation : y="+this.slope_+"x+"+this.intercept_);
-        System.out.println("MSE score for the model : "+this.mean_squared_error_);
+        System.out.println("Coefficient of correlation : "+this.coef_+"\n");
+        System.out.println("Linear Model created with equation : y="+this.slope_+"x+"+this.intercept_+"\n");
+        System.out.println("MSE score for the model : "+this.mean_squared_error_+"\n");
 
         if(this.r_square_score>0.5){
             System.out.println("Very good R^2 score.");
@@ -134,7 +136,7 @@ public class LinearRegression{
 
 
 
-    public static void main(String args[]){
+    public static void main(String args[]) throws Exception{
         System.out.println("-----PROGRAM STARTED------\n");
         Scanner sc = new Scanner(System.in);
 
@@ -145,25 +147,39 @@ public class LinearRegression{
         LinearRegression lm = new LinearRegression();
 
         try{
-            while(true){
-                // takes all the datapoints as input one by one from the user 
-                // throws exception when the required input is not received
-                System.out.print("Would you like to put one more data point? y/n : ");
-                char ch = sc.next().charAt(0);
-                if(ch=='y'){
-                    System.out.print("Enter coordinate : ");
-                    double a = sc.nextDouble();
-                    double b = sc.nextDouble();
-                    double[] coord = {a,b};
-                    lm.addCoordinate(coord);
-                }else{
-                    if(ch=='n'){
-                        break;
-                    }else{
-                        throw new Exception("Not a valid input");
-                    }
-                }
+
+            // USE THE FOLLOWING LINES TO GET DATAPOINTS FROM THE USER
+            // while(true){
+            //     takes all the datapoints as input one by one from the user 
+            //     throws exception when the required input is not received
+            //     System.out.print("Would you like to put one more data point? y/n : ");
+            //     char ch = sc.next().charAt(0);
+            //     if(ch=='y'){
+            //         System.out.print("Enter coordinate : ");
+            //         double a = sc.nextDouble();
+            //         double b = sc.nextDouble();
+            //         double[] coord = {a,b};
+            //         lm.addCoordinate(coord);
+            //     }else{
+            //         if(ch=='n'){
+            //             break;
+            //         }else{
+            //             throw new Exception("Not a valid input");
+            //         }
+            //     }
+            // }
+
+            String line = "";  
+            String splitBy = ",";  
+            
+            //parsing a CSV file into BufferedReader class constructor  
+            BufferedReader br = new BufferedReader(new FileReader("Advertising.csv"));  
+            while((line = br.readLine()) != null){  
+                String[] coor_string = line.split(splitBy);
+                double[] coord = {Double.parseDouble(coor_string[0]), Double.parseDouble(coor_string[1])};
+                lm.addCoordinate(coord);
             }
+
 
             if(lm.al.size()<4){
                 throw new Exception("Not enough datapoints to split the dataset");
@@ -180,9 +196,13 @@ public class LinearRegression{
         }catch(Exception e){
             System.out.println("Invalid input.");
         }
-
+        
+        
         sc.close();
 
-        System.out.println("-----END OF PROGRAM-----");
+        System.out.println("\n-----END OF PROGRAM-----");
+
+
+        
     }
 }
