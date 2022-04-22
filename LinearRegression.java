@@ -2,6 +2,10 @@
 import java.util.*;
 import java.io.*;
 
+// THIS PROGRAM WORKS ONLY FOR CSV FILES WITH UNIVARIATE DISTRIBUTION, I.E. ONE DEPENDENT AND ONE INDEPENDENT VARIABLE.
+// THE INDEPENDENT VARIABLE VALUES FORM THE FIRST COLUMN OF THE CSV FILE.
+// THE DEPENDENT VARIABLE VALUES ARE IN THE SECOND COLUMN OF THE CSV FILE.
+
 public class LinearRegression{
 
     // arraylist to store the coordinates 
@@ -170,12 +174,13 @@ public class LinearRegression{
             String splitBy = ",";  
             
             //parsing a CSV file into BufferedReader class constructor  
-            BufferedReader br = new BufferedReader(new FileReader("Advertising.csv"));  
+            BufferedReader br = new BufferedReader(new FileReader("Datapoints.csv"));  
             while((line = br.readLine()) != null){  
                 String[] coor_string = line.split(splitBy);
                 double[] coord = {Double.parseDouble(coor_string[0]), Double.parseDouble(coor_string[1])};
                 lm.addCoordinate(coord);
             }
+            br.close();
 
             if(lm.al.size()<4){
                 throw new Exception("Not enough datapoints to split the dataset");
